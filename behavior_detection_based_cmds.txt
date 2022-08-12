@@ -1,0 +1,22 @@
+# datasets
+behavior_xml2disp.m
+behavior_merge.m
+behavior_xml2xml.m
+# /media/manu/samsung/behavior_detection_based/voc construction
+behavior_merge2voc.m
+
+# for yolov3
+behavior_imagesets.m
+sudo ln -s /media/manu/samsung/behavior_detection_based/voc /home/manu/.mxnet/datasets/voc
+# sudo ln -s /media/manu/samsung/voc /home/manu/.mxnet/datasets/voc
+
+# for yolov5
+behavior_voc2yolov5
+behavior_imagesets_yolov5
+
+# train
+[train_yolo3.py] --gpus 0,1,2,3 --network darknet53 --syncbn
+
+# test
+[demo_yolo.py] --images /home/manu/tmp/street.jpg
+[demo_yolo.py] --pretrained /media/manu/intel/workspace/gluon-cv/scripts/detection/yolo/yolo3_darknet53_voc_best.params 
