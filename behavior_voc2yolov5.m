@@ -9,7 +9,8 @@ opts.dir_in_img = '/media/manu/samsung/behavior_detection_based/voc/VOC2007/JPEG
 opts.dir_out_base = '/media/manu/samsung/behavior_detection_based/yolov5';
 opts.dir_out_txt = '/media/manu/samsung/behavior_detection_based/yolov5/labels';
 opts.dir_out_img = '/media/manu/samsung/behavior_detection_based/yolov5/images';
-opts.names = {'stand', 'lookback', 'handsup', 'overdesk'};
+% opts.names = {'stand', 'lookback', 'handsup', 'overdesk'};
+opts.names = {'handsup'};
 opts.view = false;
 
 %%
@@ -121,6 +122,7 @@ for i = 1 : length(paths_in_img)
 
 end
 
+% number missmatch because of cnt_files_err
 fprintf('total number of point --> %d !!!\n', cnt);
 
 

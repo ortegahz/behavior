@@ -5,7 +5,7 @@
 close all; clear;
 
 %%
-opts.dir_in_img = '/media/manu/samsung/behavior_detection_based/raw_1-14/imgs';
+opts.dir_in_img = '/media/manu/samsung/behavior_detection_based/raw_1-14/imgs_voc';
 opts.dir_out_base = '/media/manu/samsung/behavior_detection_based/voc';
 
 %%
@@ -36,7 +36,7 @@ for i = 1 : length(paths_in_img)
         i, path_in_img, length(paths_in_img));
     
     path_in_xml = strrep(path_in_img, '.jpg', '.xml');
-    path_in_xml = strrep(path_in_xml, 'imgs', 'xmls_voc');
+    path_in_xml = strrep(path_in_xml, 'imgs_voc', 'xmls_voc');
     
     [~, name, ~] = fileparts(path_in_img);
     path_out_img = fullfile(dir_VOC2007_JPEGImages, [name '.jpg']);

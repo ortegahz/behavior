@@ -5,32 +5,54 @@
 close all; clear;
 
 %%
-opts.dir_in = '/media/manu/samsung/behavior_detection_based/raw_1-14/xmls';
+opts.dir_in = '/media/manu/samsung/behavior_detection_based/raw_1-14/imgs';
 opts.dir_out = '/media/manu/samsung/behavior_detection_based/raw_1-14/xmls_voc';
+opts.dir_out_imgs = '/media/manu/samsung/behavior_detection_based/raw_1-14/imgs_voc';
 opts.names = {'stand', 'lookback', 'handsup', 'overdesk'};
+% opts.names_pick = {'stand', 'lookback', 'handsup', 'overdesk'};
+opts.names_pick = {'handsup'};
+opts.drop_rate_pbg = 0.5;
+opts.drop_rate_fbg = 0.8;
 
 %%
 system(sprintf('rm %s -rvf', opts.dir_out));
 mkdir(opts.dir_out);
+system(sprintf('rm %s -rvf', opts.dir_out_imgs));
+mkdir(opts.dir_out_imgs);
 
-list_in  = struct2cell(dir(fullfile(opts.dir_in, '*.xml')))';
+list_in  = struct2cell(dir(fullfile(opts.dir_in, '*.jpg')))';
 paths_in = fullfile(opts.dir_in, list_in(:, 1));
 
 cnt_files = 0;
 cnt_files_err = 0;
-cnt_points = 0;
+cnt_points = zeros(1, 4);
 for i = 1 : length(paths_in)
     
     info = [];
     
     path_in = paths_in{i};
     [~, name, ext] = fileparts(path_in);
-    info.path = fullfile(opts.dir_out, [name ext]);
-    
-    path_img = strrep(path_in, 'xmls', 'imgs');
-    path_img = strrep(path_img, 'xml', 'jpg');
     
     fprintf('processing %d/%d xml %s\n', i, length(paths_in), path_in);
+    
+    info.path = fullfile(opts.dir_out, [name '.xml']);
+    
+    path_img = path_in;
+    path_img_out = fullfile(opts.dir_out_imgs, [name '.jpg']);
+    
+    path_in = strrep(path_img, 'imgs', 'xmls');
+    path_in = strrep(path_in, 'jpg', 'xml');
+    
+    if exist(path_in, 'file')
+        copyfile(path_img, path_img_out);
+    elseif rand() < opts.drop_rate_pbg
+        continue;
+    else  % keep bg img
+        copyfile(path_img, path_img_out);
+        continue;
+    end
+    
+%     if ~exist(path_in, 'file'), continue; end
     
     % pre-setp guarantee no empty xmls
 
@@ -64,6 +86,7 @@ for i = 1 : length(paths_in)
     info.objects = cell(1, objects.getLength);
 
     flag_err = false;
+    idxs_invalid = [];
     for j = 0 : objects.getLength - 1
         object = objects.item(j);
 
@@ -80,6 +103,11 @@ for i = 1 : length(paths_in)
             break; 
         end
         assert(c >= 1 && c <= 4);
+        
+        cp = find(strcmp(opts.names_pick, name));
+        if isempty(cp)
+            idxs_invalid = [idxs_invalid, j+1];
+        end
         
         points = object.getElementsByTagName('points');
         points =  points.item(0);
@@ -128,15 +156,19 @@ for i = 1 : length(paths_in)
             break; 
         end
         
-        cnt_points = cnt_points + 1;
+        cnt_points(c) = cnt_points(c) + 1;
 
     end
     
-    % filter illegal xmls and imgs
-    if flag_err
-        system(sprintf('rm %s -rvf', path_img));
+    % filter illegal xmls
+    if flag_err || length(idxs_invalid) == objects.getLength
+        if rand() < opts.drop_rate_fbg
+            system(sprintf('rm %s -rvf', path_img_out));
+        end
         continue; 
     end
+    
+    info.objects(idxs_invalid) = [];
     
     behavior_xmlwrite(info);
     
@@ -144,9 +176,26 @@ for i = 1 : length(paths_in)
 
 end
 
-fprintf('total number of points --> %d !!!\n', cnt_points);
+% result 1-14
+% total number of stand points --> 78305 !!!
+% total number of lookback points --> 60719 !!!
+% total number of handsup points --> 9286 !!!
+% total number of overdesk points --> 43518 !!!
+% total number of files --> 34223 !!!
+% total number of error files --> 8 !!!
+fprintf('total number of stand points --> %d !!!\n', cnt_points(1));
+fprintf('total number of lookback points --> %d !!!\n', cnt_points(2));
+fprintf('total number of handsup points --> %d !!!\n', cnt_points(3));
+fprintf('total number of overdesk points --> %d !!!\n', cnt_points(4));
 fprintf('total number of files --> %d !!!\n', cnt_files);
 fprintf('total number of error files --> %d !!!\n', cnt_files_err);
+% result 1-14 w/o actor scene
+% total number of stand points --> 55872 !!!
+% total number of lookback points --> 50420 !!!
+% total number of handsup points --> 370 !!!
+% total number of overdesk points --> 38538 !!!
+% total number of files --> 236 !!!
+% total number of error files --> 3 !!!
 
 
 %%

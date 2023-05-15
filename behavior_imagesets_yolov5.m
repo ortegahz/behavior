@@ -6,11 +6,11 @@ close all; clear;
 
 %%
 opts.dir_in_img = '/media/manu/samsung/behavior_detection_based/yolov5/images';
-opts.dir_out_txt = '/media/manu/kingstoo/yolov5/custom_behavior/labels';
-opts.dir_out_img = '/media/manu/kingstoo/yolov5/custom_behavior/images';
-opts.path_out_train = '/media/manu/kingstoo/yolov5/custom_behavior/train2017.txt';
-opts.path_out_val = '/media/manu/kingstoo/yolov5/custom_behavior/val2017.txt';
-opts.num_val = 5000;  % same as coco
+opts.dir_out_txt = '/media/manu/kingstoo/yolov5/custom_handsup/labels';
+opts.dir_out_img = '/media/manu/kingstoo/yolov5/custom_handsup/images';
+opts.path_out_train = '/media/manu/kingstoo/yolov5/custom_handsup/train2017.txt';
+opts.path_out_val = '/media/manu/kingstoo/yolov5/custom_handsup/val2017.txt';
+% opts.num_val = 4758 * 5000 / 118287;  % same rate as coco 2017
 
 %%
 system(sprintf('rm %s -rvf', fullfile(opts.dir_out_img, 'val2017')));
@@ -31,6 +31,8 @@ fid_out_train = fopen(opts.path_out_train, 'w');
 
 idxs = randperm(length(paths_in_img));
 paths_in_img = paths_in_img(idxs);
+
+opts.num_val = length(paths_in_img) * 5000 / 118287;  % same rate as coco 2017
 
 for i = 1 : length(paths_in_img)
 

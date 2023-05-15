@@ -20,3 +20,4 @@ behavior_imagesets_yolov5
 # test
 [demo_yolo.py] --images /home/manu/tmp/street.jpg
 [demo_yolo.py] --pretrained /media/manu/intel/workspace/gluon-cv/scripts/detection/yolo/yolo3_darknet53_voc_best.params 
+
